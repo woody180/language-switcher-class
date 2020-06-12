@@ -1,8 +1,8 @@
 # Setup language base
 ```
 LanguageSwitcher::set([
-    ['code' => 'en', 'name' => 'English', 'default' => true],
-    ['code' => 'de', 'name' => 'German', 'default' => false]
+    ['code' => 'en', 'name' => 'English', 'default' => 1],
+    ['code' => 'de', 'name' => 'German', 'default' => 0]
 ]);
 ```
 
