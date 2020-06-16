@@ -28,4 +28,21 @@ LanguageSwitcher::switch('de');
 ```
 // List all languages
 LanguageSwitcher::list();
+
+### Check if languages isset.
+```
+// List all languages
+LanguageSwitcher::isset();
+
+
+### Append new language.
+Append new language with language code. If appended language is default then previous default language will be reset to 0
+
+```
+// List all languages
+LanguageSwitcher::append([
+    'code' => 'fr',
+    'name' => 'french',
+    'default' => 0 // If 1 then previous default language will be set to 0
+]);
 ```
