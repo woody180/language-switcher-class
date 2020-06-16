@@ -136,4 +136,13 @@ class LanguageSwitcher {
             die('You must set language list first');
         }
     }
+
+
+    public static function isset() {
+        if (file_exists(__DIR__.'/langList.json')) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
 }
