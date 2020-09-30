@@ -145,4 +145,11 @@ class LanguageSwitcher {
             return 0;
         }
     }
+
+
+    public static function translate($defLang, $translation) {
+
+        $word = self::default()['code'] == self::active() ? $defLang : $translation;
+        return $word;
+    }
 }
