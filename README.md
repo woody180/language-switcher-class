@@ -28,11 +28,14 @@ LanguageSwitcher::switch('de');
 ```
 // List all languages
 LanguageSwitcher::list();
+```
 
 ### Check if languages isset.
+
 ```
 // List all languages
 LanguageSwitcher::isset();
+```
 
 
 ### Append new language.
@@ -44,5 +47,13 @@ LanguageSwitcher::append([
     'code' => 'fr',
     'name' => 'french',
     'default' => 0 // If 1 then previous default language will be set to 0
+]);
+```
+
+### Inline stranslation
+```
+LanguageSwitcher::translate([
+    'en' => 'Read more...',
+    'de' => 'Weiterlesen...'
 ]);
 ```
