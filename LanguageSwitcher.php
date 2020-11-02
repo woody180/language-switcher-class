@@ -147,9 +147,8 @@ class LanguageSwitcher {
     }
 
 
-    public static function translate($defLang, $translation) {
-
-        $word = self::default()['code'] == self::active() ? $defLang : $translation;
-        return $word;
+    // Inline translation
+    public static function translate(array $languages) {        
+        return $languages[self::active()];
     }
 }
