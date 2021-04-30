@@ -225,7 +225,7 @@ LanguageSwitcher::set([
         return "
            
             <div id=\"alter-language-switcher\">
-                <a href=\"#language-switcher-trigger\" class=\"{$class}language-switcher-trigger alter-language-switcher=trigger-button\" title=\"{$activeLang}\">
+                <a href=\"#language-switcher-trigger\" class=\"{$class}language-switcher-trigger alter-language-switcher-trigger-button\" title=\"{$activeLang}\">
                     $activeFlag
                 </a>
                 <ul>{$inner}</ul>
