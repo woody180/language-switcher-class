@@ -213,7 +213,8 @@ LanguageSwitcher::set([
 
             $inner .= "<li $class>
                 <a href=\"?lang={$code}\">
-                    <span>{$flag}{$langName}</span>
+                    <span>{$flag}</span>
+                    <span>{$langName}</span>
                 </a>
             </li>";
         }
