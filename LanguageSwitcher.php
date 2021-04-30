@@ -194,14 +194,9 @@ LanguageSwitcher::set([
     // Add language flags
     // Render language code HTML
     public static function render(bool $onlyFlags = true) {
-
-        if (isset($_GET['lang'])) {
+        
+        if (isset($_GET['lang']))
             self::switch($_GET['lang']);
-
-            $actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-            $url = explode('?', $actual_link)[0];
-            return header("Location: $url");
-        }
 
         $inner = "";
 
