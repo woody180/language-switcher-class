@@ -1,4 +1,4 @@
-<?php
+<?php namespace App\ThirdParty;
 /*
 // Set language base
 LanguageSwitcher::set([
@@ -193,12 +193,14 @@ LanguageSwitcher::set([
 
     // Add language flags
     // Render language code HTML
-    public static function render(bool $onlyFlags = true) {
+    public static function render(bool $onlyFlags = true, string $class = 'alter-') {
         
         if (isset($_GET['lang']))
             self::switch($_GET['lang']);
 
         $inner = "";
+        $activeLang = self::active();
+        $activeFlag = file_exists(__DIR__ . "/flags/{$activeLang}.svg") ? file_get_contents(__DIR__ . "/flags/{$activeLang}.svg") : die("Flag not found for language code - $code");;
 
         foreach (self::list() as $item) {
             
@@ -206,6 +208,7 @@ LanguageSwitcher::set([
             $flag = file_exists(__DIR__ . "/flags/{$code}.svg") ? file_get_contents(__DIR__ . "/flags/{$code}.svg") : die("Flag not found for language code - $code");
             $langName = $item['name'];
             $class = '';
+            
 
             if (!$onlyFlags) $langName = null;
 
@@ -219,7 +222,15 @@ LanguageSwitcher::set([
             </li>";
         }
         
-        return "<ul>{$inner}</ul>";
+        return "
+           
+            <div id=\"alter-language-switcher\">
+                <a href=\"#language-switcher-trigger\" class=\"{$class}language-switcher-trigger alter-language-switcher=trigger-button\" title=\"{$activeLang}\">
+                    $activeFlag
+                </a>
+                <ul>{$inner}</ul>
+            </div>
+        ";
     }
 
 
