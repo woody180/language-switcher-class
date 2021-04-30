@@ -1,24 +1,4 @@
-<?php namespace App\ThirdParty;
-/*
-// Set language base
-LanguageSwitcher::set([
-    ['code' => 'en', 'name' => 'English', 'default' => true],
-    ['code' => 'de', 'name' => 'German', 'default' => false]
-]);
-
-// Reset language base
-LanguageSwitcher::reset();
-
-// Check active language
-LanguageSwitcher::active();
-
-// Switch languages
-LanguageSwitcher::switch('de');
-
-// List all languages
-LanguageSwitcher::list();
-*/
-
+<?php 
 
 class LanguageSwitcher {
     private static $activeLang;
