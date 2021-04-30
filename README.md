@@ -6,31 +6,31 @@ LanguageSwitcher::set([
 ]);
 ```
 
-### Reset language base
+# Reset language base
 ```
 // Reset language base
 LanguageSwitcher::reset();
 ```
 
-### Check active language
+# Check active language
 ```
 // Check active language
 LanguageSwitcher::active();
 ```
 
-### Switch languages
+# Switch languages
 ```
 // Switch languages
 LanguageSwitcher::switch('de');
 ```
 
-### List all languages
+# List all languages
 ```
 // List all languages
 LanguageSwitcher::list();
 ```
 
-### Check if languages isset.
+# Check if languages isset.
 
 ```
 // List all languages
@@ -38,7 +38,7 @@ LanguageSwitcher::isset();
 ```
 
 
-### Append new language.
+# Append new language.
 Append new language with language code. If appended language is default then previous default language will be reset to 0
 
 ```
@@ -50,7 +50,17 @@ LanguageSwitcher::append([
 ]);
 ```
 
-### Inline stranslation
+# Set default language
+```
+    echo LanguageSwitcher::setDefault('de');
+```
+
+# Render language switcher HTML
+```
+echo LanguageSwitcher::render(true); true / false - with or without language titles
+```
+
+# Inline stranslation
 ```
 LanguageSwitcher::translate([
     'en' => 'Read more...',

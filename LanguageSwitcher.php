@@ -29,7 +29,7 @@ class LanguageSwitcher {
 
         // Check if language list json is not exists
         if (!is_array($languageList)) die('argument must be type of array');
-        if (file_exists(__DIR__."/langList.json")) die('language list already exist. now you can append it with \'LanguageSwitcher::append()\' method');
+        if (file_exists(__DIR__."/langList.json")) die('language list is already exist. now you can append it with <pre style="color: green; font-weight: bold;">LanguageSwitcher::append(["code" => "de", "name" => "German", "default" => 0])</pre>');
         if (empty($languageList)) die('You must provide languge code along with language name \'title\'');
 
 
@@ -53,18 +53,31 @@ class LanguageSwitcher {
     }
 
 
-    public static function append($args) {
+    public static function append(array $args = []) {
         $langList = file_get_contents(__DIR__.'/langList.json') ?? die('You must set language list first');
 
         $langList = json_decode($langList, true);
 
-        $code = $args['code'];
-        $name = $args['name'];
-        $default = $args['default'];
+        if (empty($args)) die('You must provide language code, language name and is language a default language like this - <br/> 
+<pre>
+<b style="color: green;">
+LanguageSwitcher::set([
+    ["code" => "en", "name" => "English", "default" => 1],
+    ["code" => "de", "name" => "German", "default" => 0]
+]);
+</b>
+</pre>
+        ');
+
+        $code = isset($args['code']) ? $args['code'] : die('you must provide language code like this - <b style="color: green;"><pre>LanguageSwitcher::append([\'code\' => \'de\']);</pre></b>');
+        $name = isset($args['name']) ? $args['name'] : die('You must provide language name like this - <b style="color: green;"><pre>LanguageSwitcher::append([\'name\' => \'German\']);</pre></b>');
+        $default = $args['default'] ?? 0;
+
+        if (!isset($args['default'])) $args['default'] = $default;
 
         foreach ($langList as $key => $value) {
-            if (strtolower($name) == strtolower($value['name'])) die($name . ' - already in list');
-            if (strtolower($code) == strtolower($value['code'])) die($code . ' - already in list');
+            if (strtolower($name) == strtolower($value['name'])) die($name . ' language is already in list');
+            if (strtolower($code) == strtolower($value['code'])) die($code . ' language is already in list');
         }
 
         if ($default == 1) {
@@ -74,6 +87,38 @@ class LanguageSwitcher {
         $langList[] = $args;
 
         file_put_contents(__DIR__.'/langList.json', self::toJSON($langList));
+    }
+
+
+    // Reset default language
+    public static function setDefault(string $langCode) {
+        
+        $langList = file_get_contents(__DIR__.'/langList.json') ?? die('You must set language list first');
+
+        $langList = json_decode($langList, true);
+
+        $done = false;
+
+        foreach ($langList as $key => $value) {
+            if (strtolower($value['code']) == strtolower($langCode)) {
+                $value = 1;
+                $langList[$key]['default'] = 1;
+                $done = true;
+            }
+        }
+
+        if (!$done) die("$langCode - such language code not found");
+
+        foreach ($langList as $key => $value) {
+            if (strtolower($value['code']) != strtolower($langCode)) {
+                $langList[$key]['default'] = 0;
+            }
+        }
+
+        file_put_contents(__DIR__.'/langList.json', self::toJSON($langList));
+
+        $defaultLang = self::default();
+        return "Default language is {$defaultLang['name']}";
     }
 
 
@@ -89,23 +134,19 @@ class LanguageSwitcher {
 
 
     public static function active() {
-        if (session_status() == PHP_SESSION_NONE) {
-            session_start();
-        } 
-        
-        if (isset($_SESSION['lang'])) {
+        if (!empty(self::get_cookie('lang'))) {
             $list = self::list();
             foreach ($list as $key => $value) {
-                if ( strtolower($value['code']) == strtolower($_SESSION['lang']) ) {
-                    return $_SESSION['lang'];
+                if ( strtolower($value['code']) == strtolower(self::get_cookie('lang')) ) {
+                    return self::get_cookie('lang');
                 }
             }
 
-            $_SESSION['lang'] = self::default()['code'];
-            return $_SESSION['lang'];
+            self::set_cookie(['name' => 'lang', 'value' => self::default()['code']]);
+            return self::get_cookie('lang');
         } else {
-            $_SESSION['lang'] = self::default()['code'];
-            return $_SESSION['lang'];
+            self::set_cookie(['name' => 'lang', 'value' => self::default()['code']]);
+            return self::default()['code'];
         }
     }
 
@@ -114,17 +155,14 @@ class LanguageSwitcher {
         
         if (!$lang) die('Provide language code from language list');
 
-        // Create session if not created
-        if (session_status() == PHP_SESSION_NONE) session_start();
-
         $list = self::list();
         foreach ($list as $key => $value) {
             if ( strtolower($value['code']) == strtolower($lang) ) {
-                $_SESSION['lang'] = $lang;
-                return $_SESSION['lang'];
+                self::set_cookie(['name' => 'lang', 'value' => $lang]);
+                return self::get_cookie('lang');
             }
         }
-        die('There is no such language inside language list. Check all languages - \'LanguageSwitcher::list()\'');
+        die('There is no such language inside the language list. Check all languages - \'LanguageSwitcher::list()\'');
     }
 
 
@@ -150,5 +188,80 @@ class LanguageSwitcher {
     // Inline translation
     public static function translate(array $languages) {        
         return $languages[self::active()];
+    }
+
+
+    // Add language flags
+    // Render language code HTML
+    public static function render(bool $onlyFlags = true) {
+
+        if (isset($_GET['lang'])) {
+            self::switch($_GET['lang']);
+
+            $actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+            $url = explode('?', $actual_link)[0];
+            return header("Location: $url");
+        }
+
+        $inner = "";
+
+        foreach (self::list() as $item) {
+            
+            $code = strtolower($item['code']);
+            $flag = file_exists(__DIR__ . "/flags/{$code}.svg") ? file_get_contents(__DIR__ . "/flags/{$code}.svg") : die("Flag not found for language code - $code");
+            $langName = $item['name'];
+            $class = '';
+
+            if (!$onlyFlags) $langName = null;
+
+            if (strtolower(self::active()) === strtolower($item['code'])) $class = 'class="active"';
+
+            $inner .= "<li $class>
+                <a href=\"?lang={$code}\">
+                    <span>{$flag}{$langName}</span>
+                </a>
+            </li>";
+        }
+        
+        return "<ul>{$inner}</ul>";
+    }
+
+
+
+
+    /////////////////////////////////////////////// COOKIE FUNCTIONS ///////////////////////////////////////////////
+    // Set cookie
+    protected static function set_cookie(array $data) {
+
+        $tobeStored = [
+           'name' => $data['name'] ?? null,
+           'value' => isset($data['value']) ? self::toJSON($data['value']) : null,
+           'expire' => isset($data['expire']) ? time() + $data['expire'] : time() + 86400,
+           'path' => $data['path'] ?? '/',
+           'domain' => $data['domain'] ?? "",
+           'secure' => $data['secure'] ?? false,
+           'httponly' => $data['httponly'] ?? false,
+        ];
+
+        setcookie($tobeStored['name'], $tobeStored['value'], $tobeStored['expire'], $tobeStored['path'], $tobeStored['domain'], $tobeStored['secure'], $tobeStored['httponly']);
+    }
+
+
+    // Get cookie
+    protected static function get_cookie(string $name) {
+
+        if (isset($_COOKIE[$name])) {
+            return json_decode($_COOKIE[$name]);
+        } else {
+            return false;
+        }
+    }
+
+
+    // Delete cookie
+    protected static function delete_cookie(string $name) {
+
+        if (isset($_COOKIE[$name])) setcookie($name, null, time() - 3600, '/');
+        return true;
     }
 }
