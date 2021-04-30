@@ -162,7 +162,9 @@ LanguageSwitcher::set([
                 return self::get_cookie('lang');
             }
         }
-        die('There is no such language inside the language list. Check all languages - \'LanguageSwitcher::list()\'');
+
+        self::set_cookie(['name' => 'lang', 'value' => self::default()['code']]);
+        return self::get_cookie('lang');
     }
 
 
@@ -195,7 +197,7 @@ LanguageSwitcher::set([
     // Render language code HTML
     public static function render(bool $onlyFlags = true) {
         
-        if (isset($_GET['lang']))
+        if ( isset($_GET['lang']) )
             self::switch($_GET['lang']);
 
         $inner = "";
@@ -215,7 +217,7 @@ LanguageSwitcher::set([
             if (strtolower(self::active()) === strtolower($item['code'])) $class = 'class="active"';
 
             $inner .= "<li $class>
-                <a href=\"?lang={$code}\">
+                <a data-lang=\"{$code}\" href=\"?lang={$code}\">
                     <span>{$flag}</span>
                     <span>{$langName}</span>
                 </a>
@@ -235,6 +237,11 @@ LanguageSwitcher::set([
                 function alterOpenLangageSwitcher(e)  {
                     window.event.preventDefault();
                     document.querySelector('#alter-language-switcher > ul').classList.toggle('alter-language-switcher-active');
+                    document.body.insertAdjacentHTML('beforeend', '<div style=\"position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: transparet; z-index: 98;\" onclick=\"alterSwitcherRemove()\"></div>')   
+                }
+                function alterSwitcherRemove() {
+                    document.querySelector('#alter-language-switcher > ul').classList.remove('alter-language-switcher-active');
+                    window.event.target.remove()
                 }
             </script>
         ";
