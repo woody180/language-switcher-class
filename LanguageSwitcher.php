@@ -194,7 +194,7 @@ LanguageSwitcher::set([
     // Add language flags
     // Render language code HTML
     public static function render(bool $onlyFlags = true) {
-            
+        
         if (isset($_GET['lang']))
             self::switch($_GET['lang']);
 
@@ -223,16 +223,22 @@ LanguageSwitcher::set([
         }
         
         return "
-        
+           
             <div id=\"alter-language-switcher\">
-            <a href=\"#language-switcher-trigger\" class=\"alter-language-switcher-trigger-button\" title=\"{$activeLang}\">
+                <a href=\"#language-switcher-trigger\" class=\"alter-language-switcher-trigger-button\" title=\"{$activeLang}\" onclick=\"alterOpenLangageSwitcher()\">
                     $activeFlag
                 </a>
                 <ul>{$inner}</ul>
             </div>
+
+            <script>
+                function alterOpenLangageSwitcher(e)  {
+                    window.event.preventDefault();
+                    document.querySelector('#alter-language-switcher > ul').classList.toggle('alter-language-switcher-active');
+                }
+            </script>
         ";
     }
-
 
 
 
